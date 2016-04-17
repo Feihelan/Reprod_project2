@@ -12,15 +12,16 @@ This project involves exploring the U.S. National Oceanic and Atmospheric Admini
 
 The data for this assignment come in the form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size. You can download the file from the course web site:
 
-Storm Data [47Mb]
-There is also some documentation of the database available. Here you will find how some of the variables are constructed/defined.
+Storm Data [47Mb]  
+There is also some documentation of the database available. Here you will find how some of the variables are constructed/defined.  
 
-National Weather Service Storm Data Documentation
-National Climatic Data Center Storm Events FAQ
-The events in the database start in the year 1950 and end in November 2011. In the earlier years of the database there are generally fewer events recorded, most likely due to a lack of good records. More recent years should be considered more complete.
+National Weather Service Storm Data Documentation  
+National Climatic Data Center Storm Events FAQ  
+The events in the database start in the year 1950 and end in November 2011. In the earlier years of the database there are generally fewer events recorded, most likely due to a lack of good records. More recent years should be considered more complete.  
+
 Review criterialess 
-Has either a (1) valid RPubs URL pointing to a data analysis document for this assignment been submitted; or (2) a complete PDF file presenting the data analysis been uploaded?
-Is the document written in English?
+Has either a (1) valid RPubs URL pointing to a data analysis document for this assignment been submitted; or (2) a complete PDF file presenting the data analysis been uploaded?  
+Is the document written in English?   
 Does the analysis include description and justification for any data transformations?
 Does the document have a title that briefly summarizes the data analysis?
 Does the document have a synopsis that describes and summarizes the data analysis in less than 10 sentences?
@@ -49,11 +50,11 @@ Consider writing your report as if it were to be read by a government or municip
 
 ###Requirements
 
-For this assignment you will need some specific tools
+For this assignment you will need some specific tools 
 
-RStudio: You will need RStudio to publish your completed analysis document to RPubs. You can also use RStudio to edit/write your analysis.
-knitr: You will need the knitr package in order to compile your R Markdown document and convert it to HTML
-Document Layout
+RStudio: You will need RStudio to publish your completed analysis document to RPubs. You can also use RStudio to edit/write your analysis.  
+knitr: You will need the knitr package in order to compile your R Markdown document and convert it to HTML  
+Document Layout  
 
 Language: Your document should be written in English.
 Title: Your document should have a title that briefly summarizes your data analysis
@@ -65,7 +66,7 @@ The analysis document must have at least one figure containing a plot.
 Your analysis must have no more than three figures. Figures may have multiple plots in them (i.e. panel plots), but there cannot be more than three figures total.
 You must show all your code for the work in your analysis document. This may make the document a bit verbose, but that is okay. In general, you should ensure that 𝚎𝚌𝚑𝚘 = 𝚃𝚁𝚄𝙴 for every code chunk (this is the default setting in knitr).
 Publishing Your Analysisless 
-For this assignment you will need to publish your analysis on RPubs.com. If you do not already have an account, then you will have to create a new account. After you have completed writing your analysis in RStudio, you can publish it to RPubs by doing the following:
+For this assignment you will need to publish your analysis on RPubs.com. If you do not already have an account, then you will have to create a new account. After you have completed writing your analysis in RStudio, you can publish it to RPubs by doing the following:  
 
 In RStudio, make sure your R Markdown document (.𝚁𝚖𝚍) document is loaded in the editor
 Click the 𝙺𝚗𝚒𝚝 𝙷𝚃𝙼𝙻 button in the doc toolbar to preview your document.
