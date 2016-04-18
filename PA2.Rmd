@@ -1,0 +1,163 @@
+---
+title: "Severity Weather Effect on U.S. Population Health and Economy  "
+author: "faye"
+date: "April 17, 2016"
+output: html_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T,cache = F)
+```
+## Introduction 
+
+Storms and other severe weather events can cause both public health and economic problems for communities and municipalities. Many severe events can result in fatalities, injuries, and property damage, and preventing such outcomes to the extent possible is a key concern.   
+
+This project involves exploring the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database. This database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, and property damage.
+
+The basic goal of this assignment is to explore the NOAA Storm Database and answer some basic questions about severe weather events.     
+
+The analysis address the following questions:    
+
+1.Across the United States, which types of events  are most harmful with respect to population health?      
+2.Across the United States, which types of events have the greatest economic consequences?  
+
+##Data Process
+Load library for the analysis
+```{r,echo=T}
+## load lib
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(car)
+library(knitr)
+library(magrittr)
+```
+
+### Download data and load to R 
+
+The data for this assignment come in the form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size. You can download the file from the course web site: <https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2>.
+```{r,cache=T}
+setwd("~/Desktop/course_fei/Reprod/PA2/Reprod_project2")
+#download data from link 
+url <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
+download.file (url, destfile = "data.csv.bz2", method="curl", quiet=TRUE)
+##read bz2.csv to table 
+data<-read.csv(bzfile("data.csv.bz2"), header=TRUE) 
+##check data structure
+dim(data)
+names(data)
+str(data)
+head(data,3)
+```
+
+
+
+### Select variables needed for analysis 
+The Datasets contains 37 variables , we only need some variabels, like state, event type , fatalityies , injuries , damages :
+
+```{r}
+data_work <- data[,c("STATE", "EVTYPE", "FATALITIES", "INJURIES", "PROPDMG", "PROPDMGEXP","CROPDMG", "CROPDMGEXP")]
+
+##check variables
+## of obs, # of vars ,vars structure and level
+str(data_work)
+head(data_work,3)
+##check missing
+sum (is.na (data_work))
+# summary statistics for num
+summary(data_work)
+# char vars, check freq of char
+
+##unique(data_work$EVTYPE)
+unique(data_work$PROPDMGEXP)
+unique(data_work$CROPDMGEXP)
+
+
+```
+There are 902297 obs and 8 vars in the selected datasets, no missing values.After check the   variables, It was found that EVTYPE have both lower and upper cases, and some leading and trailing spaces, so  need convert values to   upper case trim the spaces.  
+```{r}
+data_work$EVTYPE<-toupper(trimws(data_work$EVTYPE))
+```
+
+
+## Results
+
+1.Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?   
+
+### Prepare data for Health Impact
+
+Summarized number of injuries and fatalities by each event 
+```{r}
+##library(dplyr)
+population_health <- data_work  %>% group_by(EVTYPE)  %>% mutate(Total=FATALITIES+INJURIES)  %>%  summarise(Deaths=sum(FATALITIES),Injuries=sum(INJURIES),Total=sum(Total))  %>% arrange(desc(Total))
+## select top10 event for health Impact and transpose data frame to show # of death and injuries 
+##library(tidyr)
+health_plot<-gather(population_health[1:10, ], EVTYPE, Total,Deaths:Injuries)
+names(health_plot) <- c("EVTYPE", "All", "type","Total")
+```
+### Question1
+Plot top 10 event by Total ( total number of Fatalities and number of Injuries )  
+```{r ,cache=T}
+## top 10 event by Total
+ggplot(health_plot, aes(x = factor(EVTYPE), y = Total, fill =type)) + 
+        geom_bar(stat="identity") + 
+        facet_wrap(~ type, nrow=1, ncol=4) +
+        xlab("Event Type") +
+        ylab("Total") + 
+        ggtitle("Top10 total damage caused by weather events in U.S.A. for Health Impact") +        theme(axis.text.x=element_text(angle=45,hjust=1),legend.position="none")
+ 
+## top10 by Fatalities   
+kable(head(arrange(population_health,desc(Deaths)),n=10),format="markdown")         
+## top 10 by Injuries
+##kable(head(arrange(population_health,desc(Injuries)),n=10),format="markdown")                
+```
+ 
+Tornado cause the highest number of injuries and dealth.  
+
+### Prepare data for Economic Impact   
+
+2.Across the United States, which types of events have the greatest economic consequences?  
+```{r}
+## get same format for property damage and crop datamage , convert char to num
+##library(car)
+data_work$PROPDMGEXP <- as.numeric(recode(as.character(data_work$PROPDMGEXP),
+"'K'=1e+3;'M'=1e+6;''=1;'B'=1e+9;'m'=1e+6;'+'=1;'0'=1;'5'=1e+5;'6'=1e+6;'?'=1;'4'=1e+4;'2'=1e+2;'3'=1e+3;'h'=1e+2;'7'=1e+7;'H'=1e+2;'-'=1;'1'=1;'8'=1e+8"))
+data_work$CROPDMGEXP <- as.numeric(recode(as.character(data_work$CROPDMGEXP), "''=1;'M'=1e+6;'K'=1e+3;'m'=1e+3;'B'=1e+9;'?'=1;'0'=1;'k'=1e+3;'2'=1e+2"))
+# Get property and crop damage cost for each type
+eco_damage <- data_work%>% 
+        group_by(EVTYPE) %>%
+        summarise(Property=sum(PROPDMG*PROPDMGEXP, na.rm = TRUE),
+                  Crop=sum(CROPDMG*CROPDMGEXP, na.rm = TRUE), 
+                  Total=sum(PROPDMG*PROPDMGEXP, na.rm = TRUE)+
+                  sum(CROPDMG*CROPDMGEXP, na.rm = TRUE)) %>% 
+                  arrange(desc(Total))
+#select top10 events by total damage cost combined  
+damage_plot<-gather(eco_damage[1:10,], EVTYPE, Total, Property:Crop)
+names(damage_plot) <- c("EVTYPE", "All", "type","Total")
+```
+
+### Question2    
+Plot top 10 event by Total ( Total Crop and property damage cost )  
+```{r}
+## top 10 event by Total
+ggplot (damage_plot, aes(x = factor(EVTYPE), y = Total/1000000, fill =type)) + 
+        facet_wrap(~ type, nrow=1, ncol=4) +
+        geom_bar(stat="identity") + 
+        xlab("Event Type") +
+        ylab("Total M") + 
+        ggtitle("Top10 total damage caused by weather events in U.S.A.for Economic Impact ") +
+        theme(axis.text.x=element_text(angle=45,hjust=1),legend.position="none")
+ 
+
+## Top10 for  poperty damage   
+kable(head(arrange(eco_damage,desc(Property)),n=10),format="markdown")  
+## top10 for crop damage   
+kable(head(arrange(eco_damage,desc(Crop)),n=10),format="markdown")  
+      
+```
+
+Flood cause the hightest property damage and Drought cause highest crop damage.   
+
+##Conclusion
+Tornados are the weather event with the greatest impact on public health in the US with 5633 fatalities and 91346 injuries. Floods are the weather event with the greatest economical   impact in the US.  
